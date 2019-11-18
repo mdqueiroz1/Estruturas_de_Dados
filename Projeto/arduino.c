@@ -1,5 +1,6 @@
 #include <LiquidCrystal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 //Declarando as funções.
@@ -20,10 +21,8 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 typedef struct sTAREFA{
   char texto[90];
-  char data_tarefa[10];
-  /*  tarefa definida com até 100 caracteres porque a tela não 
-  consegue mostrar mais que isso xD
-  */
+  char data[10];
+  int priori;
 }TAREFA;
 
 typedef struct sCELULA{
@@ -32,12 +31,12 @@ typedef struct sCELULA{
   struct sCELULA *dir;
 }CELULA;
 
-void insere_inicio (CELULA **lista, char *frase,char *ptrData);
-void tela_print(struct sCELULA *lista);
-void init (struct sCELULA *lista);
-void get_frase(struct sCELULA **lista);
+void init(struct sCELULA **celula){
+  *celula = NULL;
+}
 
-//Funções responsáveis por executar o brilho selecionado
+struct sCELULA *f;//declaração do ponteiro
+
 void vermelhoFuncao(){
   digitalWrite(azul, LOW);
   digitalWrite(verde, LOW);
@@ -69,149 +68,283 @@ void brancoFuncao(){
   digitalWrite(vermelho, HIGH);
 }
 
-void init(struct sCELULA *lista){
-  lista = NULL;
-}
-
 void erroFuncao(){
   vermelhoFuncao();
   lcd.clear();
-  lcd.print("ERRO!!!");
-  delay(1000);
-  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("     Erro!!     ");
+  delay(10);
   brancoFuncao();
 }
 
-int empty(struct sCELULA *lista){
-  if(lista == NULL){
-    erroFuncao();
-    return 1;
-  }
-    return 0;
+void voltaFuncao(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("CLICK P/ VOLTAR ");
+  lcd.setCursor(0,1);
+  lcd.print("<---------------");
 }
 
-void get_frase(struct sCELULA **lista){
+int vazio(struct sCELULA *lista){ //testa se a lista esta vazia
+  if(lista == NULL)
+      return 1;
   
-  int i=0;
-  azulFuncao();
-  char frase[90],data[10];
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("INSIRA A TAREFA:");
-  lcd.setCursor(0,1);
-  lcd.print("LIM100CARACTERES");
-  while(i == 0){
-    while(Serial.available() > 0){
-      frase[i]=Serial.read();
-      i++;
-      delay(10);
-    }
-  }
-  delay(50);
-  i=0;
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("INSIRA A DATA NA");
-  lcd.setCursor(0,1);
-  lcd.print("FORMA DD/MM/AAAA");  
-  while(i == 0){
-    while(Serial.available() > 0){
-      data[i]=Serial.read();
-      i++;
-      delay(10);
-    }
-  }
-  insere_inicio(lista,frase,data);
-  menu(*lista);
-}/* Funcao criada pra pegar a frase e entrar na insere_inicio */
-
-void insere_inicio (struct sCELULA **lista, char *frase,char *ptrData){
-  CELULA *q;
-  q = (CELULA *) malloc(sizeof(CELULA));
-   brancoFuncao();
-  lcd.clear();
-  if(q != NULL){
-    strcpy(q->info.texto,frase);
-    strcpy(q->info.data_tarefa, ptrData);
-    q->esq = NULL;
-    q->dir = *lista;
-    if(!empty(*lista)){
-      (*lista)->esq = q;
-    }
-    *lista = q;
-  }else{
-    erroFuncao();
-    exit(1);
-  }
-  verdeFuncao();
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Tarefa adiciona-");
-  delay(10);
-  lcd.setCursor(0,1);
-  lcd.print("da com sucesso!!");
-  delay(10);
-  menu(*lista);
+  return 0;
 }
-void remove_inicio(struct sCELULA **lista){
+
+void remove_inicio(struct sCELULA **lista){ 
   CELULA *q;
 
   q = *lista;
-  if(!empty(*lista)){
-    *lista = q->dir;
-    (*lista)->esq = NULL;
+
+  if(!vazio(q)){
+    
+    *lista= q->dir;
     free(q);
+    
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("  REMOVIDO COM  ");
+    lcd.setCursor(0,1);
+    lcd.print("     SUCESSO    ");
+    Serial.println("Removido com sucesso");
+    delay(1000);
+    voltaFuncao();
+  
   }else{
     erroFuncao();
-    exit(1);
+  }
+    delay(100);
+  menu(*lista);
+}
+
+void insere_inicio (struct sCELULA **lista, char strtexto[90], char strdata[10], int priori){
+  CELULA *q;
+
+  q = (CELULA*) malloc(sizeof(CELULA));
+
+  int i=0;
+  azulFuncao();
+
+  if(q!=NULL){
+    strcpy(q->info.data, strdata);
+    strcpy(q->info.texto, strtexto);
+    q->info.priori = priori;
+    q->esq = NULL;
+    q->dir = (*lista);
+    if(vazio(*lista))
+      (*lista)->esq = q;
+    
+    (*lista) = q;
+  }else{
+    erroFuncao();
+  }
+  delay(10);
+  brancoFuncao();
+  Serial.println("Adicionado com sucesso");
+  voltaFuncao();
+  menu(*lista);
+}
+
+void printa_lista(struct sCELULA *lista){
+  
+  CELULA *aux;
+  aux = lista;
+
+  int clickSelect=0,paraLoop=0;
+
+  if(!vazio(aux)){
+
+    while(1){
+      
+      delay(10);
+      
+      if(paraLoop == 0){
+        
+        lcd.clear();
+        if((strlen(aux->info.texto))>40){
+          lcd.setCursor(0,0);
+          lcd.print(aux->info.data);
+          lcd.setCursor(0,11);
+          lcd.print(aux->info.texto);
+          lcd.setCursor(0,1);
+          lcd.print(aux->info.texto[40]); 
+        }else{
+          lcd.setCursor(0,0);
+          lcd.print(aux->info.data);
+          lcd.setCursor(0,11);
+          lcd.print(aux->info.texto);
+        }
+        paraLoop++;
+      }
+      
+      lcd.scrollDisplayLeft();
+      delay(200);
+    if (digitalRead(BotSeleciona) == HIGH){
+        delay(10);
+        voltaFuncao();
+        menu(lista);
+      }
+      if(digitalRead(BotDirPin) == HIGH){
+        if((aux->dir)!= NULL){
+          aux=aux->dir;
+          delay(10);
+          paraLoop=0;
+        }else{
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("P/ SAIR APERTE");
+          lcd.setCursor(0,11);
+          lcd.print("O BOTAO SELECT");
+          delay(1000);
+          paraLoop=0;
+        }
+      }
+      if(digitalRead(BotEsqPin) == HIGH){
+        if((aux->dir)!= NULL){
+          aux=aux->esq;
+          delay(10);
+          paraLoop=0;
+        }else{
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("P/ SAIR APERTE");
+          lcd.setCursor(0,11);
+          lcd.print("O BOTAO SELECT");
+          delay(1000);
+          paraLoop=0;
+        }
+      }
+    }
+    delay(100);
+  }else{
+    erroFuncao();
+    menu(lista);
   }
 }
 
-void tela_print(struct sCELULA *lista){
-  CELULA *aux;
-  aux = lista;
-  int BotEstadoDir = 0,BotEstadoEsq = 0;//seta os estados para LOW
-  
-  Serial.println(aux->info.texto);
-  
-  int i=0,stringTam;
-  stringTam = strlen(aux->info.texto);
-  
-  if(stringTam>50){
-    lcd.clear();
-    
-    lcd.setCursor(0,0);
-    lcd.print(aux->info.texto);
-    
-    lcd.setCursor(0,1);
-    lcd.print(aux->info.texto[50]);
-  }else{
-    //Limpa a tela
-   lcd.clear();
-    //Posiciona o cursor na coluna 0, linha 0;
-    lcd.setCursor(0,0);
-    //Envia o texto para o LCD
-    lcd.print(aux->info.texto);
-  }
-  
-  BotEstadoDir = digitalRead(BotDirPin);
-  BotEstadoEsq = digitalRead(BotEsqPin);
-  delay(100);
+void insere_fim(struct sCELULA **lista, char insere_texto[90],char insere_data[8],int intPrioridade){
+	CELULA *q;
+	CELULA *aux;
 
-  //Rolagem para a esquerda
-  do{
-    lcd.scrollDisplayLeft();
-    delay(100);
-    BotEstadoEsq = digitalRead(BotEsqPin);
-    BotEstadoDir = digitalRead(BotDirPin);
-    if(BotEstadoEsq == HIGH){
-      aux = aux->esq;
-    }
-    if(BotEstadoDir == HIGH){
-      aux = aux->dir;
-    }
-  }while(BotEstadoEsq == LOW || BotEstadoDir == LOW);
+	q = (CELULA*) malloc(sizeof(CELULA));
+
+	if(q!= NULL) {
+		strcpy(q->info.texto, insere_texto);
+		strcpy(q->info.data, insere_data);
+		q->info.priori = intPrioridade;
+		q->esq = NULL;
+		q->dir = NULL;
+		if (vazio(*lista)){
+			*lista = q;
+		}else{
+			aux = *lista;
+			while (aux->dir != NULL)
+				aux = aux->dir;
+
+			aux->dir = q;
+			q->esq = aux;
+		}
+	}else{
+		erroFuncao();
+	}
+		delay(100);
+  		voltaFuncao();
+		menu(*lista);
+}
+
+void insere_lista(struct sCELULA **lista, char insere_texto[90],char insere_data[8],int intPrioridade){
+  CELULA *aux;
+  CELULA *q;
+
+  q = (CELULA*) malloc(sizeof(CELULA));
+  if(q != NULL){
+    strcpy(q->info.texto, insere_texto);
+    strcpy(q->info.data, insere_data);
+    q->info.priori = intPrioridade;
+  }else{
+    erroFuncao();
+    Serial.println("memoria");
+    exit(1);
+  }
+
+  aux = (*lista);
   
+  while(aux != NULL && intPrioridade >= aux->info.priori){
+		aux = aux->dir;
+	}
+
+	if (aux == NULL){
+		insere_fim(lista, insere_texto, insere_data, intPrioridade);
+	}
+
+	q->dir = aux->dir;
+  	aux->dir = q;
+	q->esq = aux;
+  	
+  
+
+	if((*lista) == aux){
+		(*lista) = q;
+		delay(100);
+		voltaFuncao();
+		menu(*lista);
+	}
+	voltaFuncao();
+	aux->esq->dir = q;
+}
+
+void recebe_dados(struct sCELULA *lista){
+	
+	char strtexto[90],strdata[10],strpriori[1];
+  	int i=0;
+  	int priori;
+
+  	lcd.clear();
+  	lcd.setCursor(0,0);
+  	lcd.print("INSIRA A TAREFA:");
+  	lcd.setCursor(0,1);
+  	lcd.print("LIM100CARACTERES");
+  	while(i == 0){
+    	while(Serial.available() > 0){
+      		strtexto[i]=Serial.read();
+      		i++;
+      		delay(10);
+    	}
+  	}
+  	delay(50);
+  	i=0;
+  	lcd.clear();
+  	lcd.setCursor(0,0);
+  	lcd.print("INSIRA A DATA NA");
+  	lcd.setCursor(0,1);
+  	lcd.print("FORMA DD/MM/AAAA");  
+  	while(i == 0){
+    	while(Serial.available() > 0){
+      		strdata[i]=Serial.read();
+      		i++;
+      		delay(10);
+    	}
+  	}
+  	delay(50);
+  	i=0;
+  	lcd.clear();
+  	lcd.setCursor(0,0);
+  	lcd.print("INSIRA A PRIORI");
+  	lcd.setCursor(0,1);
+  	lcd.print("DADE 1, 2 OU 3 ");  
+  	while(i == 0){
+    	while(Serial.available() > 0){
+      		strpriori[i]=Serial.read();
+      		i++;
+      		delay(10);
+          	priori = atoi(strpriori);
+              Serial.println(priori);
+    	}
+  	}
+  	delay(200);
+  	insere_lista(&lista, strtexto, strdata, priori);
+  	delay(200);
 }
 
 int clickDir=0, clickSelect=0, intLoop=0;
@@ -221,6 +354,8 @@ as opções do menu.
 */
 
 void menu(struct sCELULA *lista){
+  
+  while(1){
   
   if(clickDir>2){
     clickDir=2;
@@ -264,39 +399,41 @@ void menu(struct sCELULA *lista){
      intLoop=0;
    }
    if(digitalRead(BotSeleciona)==HIGH && clickDir == 0){
-      tela_print(lista);
+     printa_lista(lista);
 
    }
    if(digitalRead(BotSeleciona)==HIGH && clickDir == 1){
-      get_frase(&lista);
+      recebe_dados(lista);
    }
    if(digitalRead(BotSeleciona)==HIGH && clickDir == 2){
      remove_inicio(&lista);
    }
+
+  }
+
 }
 
-
-void setup()
-{
+void setup(){
   //Define o número de colunas e linhas do LCD
   lcd.begin(16, 2);
-  
+
   //Define os botões como entrada
   pinMode(BotDirPin, INPUT);
   pinMode(BotEsqPin, INPUT);
   pinMode(BotSeleciona, INPUT);
-  
-  Serial.begin(9600);
+
+  Serial.begin(57600);
   //Define os leds
   pinMode(azul, OUTPUT);
   pinMode(verde, OUTPUT);
   pinMode(vermelho, OUTPUT);
-  struct sCELULA *f;
-  init (f);
+  
+  init (&f);
+    
 }
+
 void loop()
-{ 
-  struct sCELULA *f;
+{
   brancoFuncao();
   menu(f);
 }
