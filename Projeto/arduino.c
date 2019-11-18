@@ -85,14 +85,14 @@ void voltaFuncao(){
   lcd.print("<---------------");
 }
 
-int vazio(struct sCELULA *lista){ //testa se a lista esta vazia
+int vazio(struct sCELULA *lista){
   if(lista == NULL)
       return 1;
   
   return 0;
 }
 
-void remove_inicio(struct sCELULA **lista){ 
+void remove_inicio(struct sCELULA **lista){
   CELULA *q;
 
   q = *lista;
@@ -164,16 +164,24 @@ void printa_lista(struct sCELULA *lista){
         lcd.clear();
         if((strlen(aux->info.texto))>40){
           lcd.setCursor(0,0);
-          lcd.print(aux->info.data);
-          lcd.setCursor(0,11);
+          lcd.print("PRIORI");
+          lcd.setCursor(7,0);
+		  lcd.print(aux->info.priori);
+		  lcd.setCursor(9,0);
+		  lcd.print(aux->info.data);
+		  lcd.setCursor(0,14);
           lcd.print(aux->info.texto);
           lcd.setCursor(0,1);
           lcd.print(aux->info.texto[40]); 
         }else{
-          lcd.setCursor(0,0);
-          lcd.print(aux->info.data);
-          lcd.setCursor(0,11);
-          lcd.print(aux->info.texto);
+         lcd.setCursor(0,0);
+         lcd.print("PRIORI");
+         lcd.setCursor(7,0);
+		 lcd.print(aux->info.priori);
+		 lcd.setCursor(9,0);
+		 lcd.print(aux->info.data);
+		 lcd.setCursor(0,14);
+         lcd.print(aux->info.texto);
         }
         paraLoop++;
       }
@@ -332,7 +340,13 @@ void recebe_dados(struct sCELULA *lista){
   	lcd.setCursor(0,0);
   	lcd.print("INSIRA A PRIORI");
   	lcd.setCursor(0,1);
-  	lcd.print("DADE 1, 2 OU 3 ");  
+  	lcd.print("DADE 1, 2 OU 3 ");
+  	delay(4500);
+  	lcd.clear(); 
+  	lcd.setCursor(0,0); 
+  	lcd.print("1-ALTA |2-MEDIA");
+  	lcd.setCursor(0,1);
+  	lcd.print("     3-BAIXA   "); 
   	while(i == 0){
     	while(Serial.available() > 0){
       		strpriori[i]=Serial.read();
