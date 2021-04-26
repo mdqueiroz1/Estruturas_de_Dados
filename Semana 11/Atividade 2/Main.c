@@ -18,7 +18,7 @@ int menu(DEQUE *ptrD){
         case 1:{
             printf("Informe o numero:\n");
             scanf("%d", &elem);
-            inserirInicio(ptrD, elem);
+            inserirInicioDeque(ptrD, elem);
             break;
         }
         case 2:{
