@@ -11,3 +11,9 @@ DEQUE* alocaDeque(){
     return (DEQUE*) malloc(sizeof(DEQUE));
 }
 
+int dequeVazia(DEQUE *ptrD){
+    if (ptrD == NULL) return 1;
+    if (ptrD->inicio == NULL) return 1;
+    return 0;
+}
+

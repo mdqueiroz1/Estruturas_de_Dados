@@ -3,9 +3,9 @@
 
 #include "BBT_DequeEstatico.c"
 
-int menu(DEQUE *prtD){
+int menu(DEQUE **ptrD){
     
-    int loop;
+    int loop, elem;
 
     printf("1-Inserir no inicio.\n");
     printf("2-Inserir no final.\n");
@@ -16,27 +16,31 @@ int menu(DEQUE *prtD){
     scanf("%d", &loop);
     switch (loop){
         case 1:{
-            inserirInicio();
+            printf("Informe o numero:\n");
+            scanf("%d", &elem);
+            inserirInicio(ptrD, elem);
             break;
         }
         case 2:{
-            inserirFinal();
+            printf("Informe o numero:\n");
+            scanf("%d", &elem);            
+            inserirFinal(ptrD, elem);
             break;
         }
         case 3:{
-            removerInicio();
+            removerInicio(ptrD);
             break;
         }
         case 4:{
-            removerFinal();
+            removerFinal(ptrD);
             break;
         }
         case 5:{
-            listaNaoClassico();
+            listaNaoClassico(ptrD);
             break;
         }
         case 6:{
-            listaClassico();
+            listaClassico(ptrD);
             break;
         }
 
