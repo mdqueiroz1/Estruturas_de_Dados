@@ -57,3 +57,31 @@ void insereFinalDeque(DEQUE **ptrD, int elem){
 
     (*ptrD)->final = novo;
 }
+
+void removeInicioDeque(DEQUE **ptrD){
+    if(*ptrD == NULL) return 0;
+    if((*ptrD)->inicio == NULL) return 0;
+
+    DEQUE *aux = (*ptrD)->inicio;
+    (*ptrD)->inicio = (*ptrD)->inicio->dir;
+    if((*ptrD)->inicio == NULL)
+        (*ptrD)->final = NULL;
+    else
+        (*ptrD)->inicio->esq = NULL;
+    free(aux);
+}
+
+void removeFinalDeque(DEQUE **ptrD){
+    if(*ptrD == NULL) return 0;
+    if((*ptrD)->inicio == NULL) return 0;
+
+    DEQUE *aux = (*ptrD)->final;
+    if(aux == (*ptrD)->inicio){
+        (*ptrD)->inicio == NULL;
+        (*ptrD)->final == NULL;
+    }else{
+        aux->esq->dir = NULL;
+        (*ptrD)->final = aux->dir;
+    }
+    free(aux);
+}

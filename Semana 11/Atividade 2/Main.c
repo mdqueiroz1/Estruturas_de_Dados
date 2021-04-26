@@ -28,11 +28,11 @@ int menu(DEQUE *ptrD){
             break;
         }
         case 3:{
-            removerInicio(ptrD);
+            removeInicioDeque(ptrD);
             break;
         }
         case 4:{
-            removerFinal(ptrD);
+            removeFinalDeque(ptrD);
             break;
         }
         case 5:{
