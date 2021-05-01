@@ -20,29 +20,34 @@ int dequeVazia(DEQUE *ptrD){
 }
 
 void insereInicioDeque(DEQUE **ptrD, int elem){
-    if(*ptrD == NULL) return 0;
+    if(*ptrD == NULL) return;
     
     DEQUE *novo;
     novo = alocaDeque();
-    if(novo == NULL) return 0;
-
+    if(novo == NULL) {
+        printf("Não foi alocado.\n");
+        return;
+    }
     novo->info = elem;
     novo->dir = (*ptrD)->inicio;
     novo->esq = NULL;
-    if((*ptrD)->inicio == NULL) 
+    if((*ptrD)->inicio == NULL) {
         (*ptrD)->final = novo;
-    else 
+        printf("adicionou no inicio\n");
+    }else {
         (*ptrD)->inicio->esq = novo;
+        printf("adicionou depois do inicio\n");
+    }
 
     (*ptrD)->inicio = novo;
 }
 
 void insereFinalDeque(DEQUE **ptrD, int elem){
-    if(*ptrD == NULL) return 0;
+    if(*ptrD == NULL) return;
 
     DEQUE *novo;
     novo = alocaDeque();
-    if(novo == NULL) return 0;
+    if(novo == NULL) return;
 
     novo->info = elem;
     novo->dir = NULL;
@@ -59,8 +64,8 @@ void insereFinalDeque(DEQUE **ptrD, int elem){
 }
 
 void removeInicioDeque(DEQUE **ptrD){
-    if(*ptrD == NULL) return 0;
-    if((*ptrD)->inicio == NULL) return 0;
+    if(*ptrD == NULL) return;
+    if((*ptrD)->inicio == NULL) return;
 
     DEQUE *aux = (*ptrD)->inicio;
     (*ptrD)->inicio = (*ptrD)->inicio->dir;
@@ -72,16 +77,32 @@ void removeInicioDeque(DEQUE **ptrD){
 }
 
 void removeFinalDeque(DEQUE **ptrD){
-    if(*ptrD == NULL) return 0;
-    if((*ptrD)->inicio == NULL) return 0;
+    if(*ptrD == NULL) return;
+    if((*ptrD)->inicio == NULL) return;
 
     DEQUE *aux = (*ptrD)->final;
     if(aux == (*ptrD)->inicio){
-        (*ptrD)->inicio == NULL;
-        (*ptrD)->final == NULL;
+        (*ptrD)->inicio = NULL;
+        (*ptrD)->final = NULL;
     }else{
         aux->esq->dir = NULL;
         (*ptrD)->final = aux->dir;
     }
     free(aux);
+}
+
+void listaNaoClassico(DEQUE *ptrD){
+    DEQUE *aux;
+    aux = ptrD;
+    if(dequeVazia(ptrD)) return;
+    
+    while(aux != NULL){
+        printf("%d\t", aux->info);
+        aux = aux->dir;
+    }
+    printf("\n");
+}
+
+void listaClassico(DEQUE *ptrD){
+    return;
 }
