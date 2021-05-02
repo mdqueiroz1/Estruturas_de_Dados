@@ -3,7 +3,7 @@
 
 #include "BBT_DequeDinamico.c"
 
-int menu(DEQUE **ptrD){
+int menu(DEQUE *ptrD){
     
     int loop, elem;
 
@@ -19,6 +19,7 @@ int menu(DEQUE **ptrD){
             printf("Informe o numero:\n");
             scanf("%d", &elem);
             insereInicioDeque(ptrD, elem);
+            system("cls");
             break;
         }
         case 2:{
@@ -36,7 +37,7 @@ int menu(DEQUE **ptrD){
             break;
         }
         case 5:{
-            listaNaoClassico(*ptrD);
+            listaNaoClassico(ptrD);
             break;
         }
         case 6:{
@@ -51,9 +52,13 @@ int menu(DEQUE **ptrD){
 
 int main(){
     DEQUE *ptrD;
+    init(ptrD);
+
     int loop;
+    
     do{
-        loop = menu(&ptrD);
+        loop = menu(ptrD);
     }while(loop != 9);
+    printf("programa finalizado!\n\n");
     return 0;
 }

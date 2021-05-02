@@ -1,100 +1,112 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct sDEQUE{
+typedef struct sNo{
     int info;
-    struct sDEQUE *dir;
-    struct sDEQUE *esq;
-    struct sDEQUE *inicio;
-    struct sDEQUE *final;
+    struct sNo *dir;
+    struct sNo *esq;
+}NO;
+
+typedef struct sDEQUE{
+    NO *inicio;
+    NO *final;
 }DEQUE;
 
-DEQUE* alocaDeque(){
-    return (DEQUE*) malloc(sizeof(DEQUE));
+NO* alocaNo(){
+    return ((NO*) malloc(sizeof(NO)));
 }
 
-int dequeVazia(DEQUE *ptrD){
+void init(DEQUE *ptrD){
+    ptrD = ((DEQUE*) malloc(sizeof(DEQUE)));
+    ptrD->inicio = NULL;
+    ptrD->final = NULL;
+}
+
+int vazio(DEQUE *ptrD){
     if (ptrD == NULL) return 1;
     if (ptrD->inicio == NULL) return 1;
+    
     return 0;
 }
 
-void insereInicioDeque(DEQUE **ptrD, int elem){
-    if(*ptrD == NULL) return;
+void insereInicioDeque(DEQUE *ptrD, int elem){
+    if(ptrD == NULL){
+        printf("Deque nao inicializado!\n");
+        return;
+    }     
     
-    DEQUE *novo;
-    novo = alocaDeque();
+    NO *novo;
+    novo = alocaNo();
     if(novo == NULL) {
         printf("Não foi alocado.\n");
         return;
     }
+    
     novo->info = elem;
-    novo->dir = (*ptrD)->inicio;
+    novo->dir = ptrD->inicio;
     novo->esq = NULL;
-    if((*ptrD)->inicio == NULL) {
-        (*ptrD)->final = novo;
-        printf("adicionou no inicio\n");
+
+    if(vazio(ptrD)) {
+        ptrD->final = novo;
     }else {
-        (*ptrD)->inicio->esq = novo;
-        printf("adicionou depois do inicio\n");
+        (ptrD->inicio)->esq = novo;
     }
 
-    (*ptrD)->inicio = novo;
+    ptrD->inicio = novo;
 }
 
-void insereFinalDeque(DEQUE **ptrD, int elem){
-    if(*ptrD == NULL) return;
+void removeFinalDeque(DEQUE *ptrD){
+    if(ptrD == NULL) return;
+    if(ptrD->inicio == NULL) return;
 
-    DEQUE *novo;
-    novo = alocaDeque();
+    NO *aux = ptrD->final;
+    if(aux == ptrD->inicio){
+        ptrD->inicio = NULL;
+        ptrD->final = NULL;
+    }else{
+        (aux->esq)->dir = NULL;
+        ptrD->final = aux->dir;
+    }
+    free(aux);
+}
+
+void insereFinalDeque(DEQUE *ptrD, int elem){
+    NO* novo;
+    novo = alocaNo();
     if(novo == NULL) return;
 
     novo->info = elem;
     novo->dir = NULL;
-    
-    if((*ptrD)->final == NULL){
-        novo->esq = NULL;
-        (*ptrD)->inicio = novo;
-    }else{
-        novo->esq = (*ptrD)->final;
-        (*ptrD)->final->dir = novo;
-    }
 
-    (*ptrD)->final = novo;
+    if(vazio(ptrD) == 1){
+        ptrD->inicio = novo;
+        ptrD->final = novo;
+    }else{
+        (ptrD->final)->dir = novo;
+        novo->esq = ptrD->final;
+        ptrD->final = novo;
+    }
 }
 
-void removeInicioDeque(DEQUE **ptrD){
-    if(*ptrD == NULL) return;
-    if((*ptrD)->inicio == NULL) return;
+void removeInicioDeque(DEQUE *ptrD){
+    NO *aux;
+    if(vazio(ptrD)) return;
 
-    DEQUE *aux = (*ptrD)->inicio;
-    (*ptrD)->inicio = (*ptrD)->inicio->dir;
-    if((*ptrD)->inicio == NULL)
-        (*ptrD)->final = NULL;
+    aux = (ptrD->inicio)->dir;
+    free(ptrD->inicio);
+    ptrD->inicio = aux;
+
+    if(ptrD->inicio != NULL)
+        (ptrD->inicio)->esq = NULL;
     else
-        (*ptrD)->inicio->esq = NULL;
-    free(aux);
-}
-
-void removeFinalDeque(DEQUE **ptrD){
-    if(*ptrD == NULL) return;
-    if((*ptrD)->inicio == NULL) return;
-
-    DEQUE *aux = (*ptrD)->final;
-    if(aux == (*ptrD)->inicio){
-        (*ptrD)->inicio = NULL;
-        (*ptrD)->final = NULL;
-    }else{
-        aux->esq->dir = NULL;
-        (*ptrD)->final = aux->dir;
-    }
-    free(aux);
+        ptrD->final = NULL;
 }
 
 void listaNaoClassico(DEQUE *ptrD){
-    DEQUE *aux;
-    aux = ptrD;
-    if(dequeVazia(ptrD)) return;
+    if(vazio(ptrD)) return;
+    
+    NO *aux;
+    aux = ptrD->inicio;
     
     while(aux != NULL){
         printf("%d\t", aux->info);
