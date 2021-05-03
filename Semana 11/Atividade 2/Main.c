@@ -51,14 +51,13 @@ int menu(DEQUE *ptrD){
 
 
 int main(){
-    DEQUE *ptrD;
-    init(ptrD);
+    DEQUE ptrD;
+    init(&ptrD);
+    printf("aq\n");
 
-    int loop;
-    
+    int loop = 0;
     do{
-        loop = menu(ptrD);
+        loop = menu(&ptrD);
     }while(loop != 9);
-    printf("programa finalizado!\n\n");
     return 0;
 }

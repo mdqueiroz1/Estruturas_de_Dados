@@ -11,10 +11,7 @@ pilha* alocaNo(){
 }
 
 void init(pilha *ptrP){
-    
-    ptrP = alocaNo();
     ptrP->dir = NULL;
-
     if ( ptrP == NULL ){
         printf("Erro na alocacao do no\n");
         exit(0);
@@ -22,7 +19,7 @@ void init(pilha *ptrP){
 }
 
 int vaziaPilha(pilha *ptrP){
-    if ( ptrP == NULL ) return 1;
+    if ( ptrP->dir == NULL ) return 1;
     return 0;
 }
 
@@ -63,7 +60,7 @@ void listaClassico(pilha *ptrP){
         printf("%d\n", ptrP->info);
         aux = ptrP;
         ptrP = ptrP->dir;
-        free(aux);
+        removePilha(aux);
     }
 }
 
@@ -76,10 +73,8 @@ void listaNaoClassico(pilha *ptrP){
     pilha *aux;
     aux = ptrP;
 
-    while(aux != NULL){
-        printf("%d %d\n", aux->info, aux->dir);
+    while(!vaziaPilha(aux)){
+        printf("%d\n", aux->info);
         aux = aux->dir;
     }
-    printf("---\n");
-    return;
 }

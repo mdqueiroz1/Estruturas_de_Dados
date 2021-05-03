@@ -8,6 +8,7 @@ typedef struct sNo{
 }NO;
 
 typedef struct sDEQUE{
+    int qnt;
     NO *inicio;
     NO *final;
 }DEQUE;
@@ -17,13 +18,12 @@ NO* alocaNo(){
 }
 
 void init(DEQUE *ptrD){
-    ptrD = ((DEQUE*) malloc(sizeof(DEQUE)));
     ptrD->inicio = NULL;
     ptrD->final = NULL;
+    ptrD->qnt = 0;
 }
 
-int vazio(DEQUE *ptrD){
-    if (ptrD == NULL) return 1;
+int vazioDeque(DEQUE *ptrD){
     if (ptrD->inicio == NULL) return 1;
     
     return 0;
@@ -46,18 +46,19 @@ void insereInicioDeque(DEQUE *ptrD, int elem){
     novo->dir = ptrD->inicio;
     novo->esq = NULL;
 
-    if(vazio(ptrD)) {
+    if(vazioDeque(ptrD)) {
         ptrD->final = novo;
     }else {
         (ptrD->inicio)->esq = novo;
     }
 
     ptrD->inicio = novo;
+    ptrD->qnt += 1;
 }
 
 void removeFinalDeque(DEQUE *ptrD){
     if(ptrD == NULL) return;
-    if(ptrD->inicio == NULL) return;
+    if(vazioDeque(ptrD)) return;
 
     NO *aux = ptrD->final;
     if(aux == ptrD->inicio){
@@ -68,6 +69,7 @@ void removeFinalDeque(DEQUE *ptrD){
         ptrD->final = aux->dir;
     }
     free(aux);
+    ptrD->qnt -= 1;
 }
 
 void insereFinalDeque(DEQUE *ptrD, int elem){
@@ -78,7 +80,7 @@ void insereFinalDeque(DEQUE *ptrD, int elem){
     novo->info = elem;
     novo->dir = NULL;
 
-    if(vazio(ptrD) == 1){
+    if(vazioDeque(ptrD) == 1){
         ptrD->inicio = novo;
         ptrD->final = novo;
     }else{
@@ -86,11 +88,12 @@ void insereFinalDeque(DEQUE *ptrD, int elem){
         novo->esq = ptrD->final;
         ptrD->final = novo;
     }
+    ptrD->qnt += 1;
 }
 
 void removeInicioDeque(DEQUE *ptrD){
     NO *aux;
-    if(vazio(ptrD)) return;
+    if(vazioDeque(ptrD)) return;
 
     aux = (ptrD->inicio)->dir;
     free(ptrD->inicio);
@@ -100,10 +103,12 @@ void removeInicioDeque(DEQUE *ptrD){
         (ptrD->inicio)->esq = NULL;
     else
         ptrD->final = NULL;
+    
+    ptrD->qnt -= 1;
 }
 
 void listaNaoClassico(DEQUE *ptrD){
-    if(vazio(ptrD)) return;
+    if(vazioDeque(ptrD)) return;
     
     NO *aux;
     aux = ptrD->inicio;
@@ -116,5 +121,14 @@ void listaNaoClassico(DEQUE *ptrD){
 }
 
 void listaClassico(DEQUE *ptrD){
+
+    if(vazioDeque(ptrD)) return;
+
+    while(ptrD->inicio != NULL){
+        printf("%d\t", ptrD->inicio->info);
+        removeInicioDeque(ptrD);
+    }
+
+    printf("\n");
     return;
 }
