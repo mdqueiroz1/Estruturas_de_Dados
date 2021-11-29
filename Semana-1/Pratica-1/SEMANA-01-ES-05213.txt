@@ -1,0 +1,51 @@
+-------------------- Atividade 2-------------------------
+
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct sAluno{
+    int matricula;
+    char nome[21];
+    float nota;
+}Aluno;
+
+void cadastrarAluno(Aluno *aluno){
+    
+    printf("Numero de matricula:\n");
+    scanf("%d", &aluno->matricula);
+    fflush(stdin);
+    
+    printf("Nome do aluno:\n");
+    scanf("%[^\n]", aluno->nome);
+    fflush(stdin);
+
+    printf("Nota final do aluno:\n");
+    scanf("%f", &aluno->nota);
+    fflush(stdin);
+    
+}
+
+int main(){
+
+    int qnt;
+    float media = 0; 
+    scanf("%d", &qnt);
+
+    Aluno aluno[qnt];
+
+    for (int i = 0; i < qnt; i++){
+        cadastrarAluno(&aluno[i]);
+        media += aluno[i].nota;
+    }
+    
+    media /= qnt;
+
+    printf("A nota media da turma e %.2f", media);
+
+    return 0;
+}
+
+-------------------- Atividade 3-------------------------
+
+-------------------- Atividade 4-------------------------
+Adicionar a linha (9) free(q);
