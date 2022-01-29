@@ -4,7 +4,7 @@
 int main(){
     
     int *x, *y;
-    x = (int *)calloc(sizeof(int));
+    x = (int *) malloc (sizeof(int));
     y = x;
     if (x != NULL)
     {
