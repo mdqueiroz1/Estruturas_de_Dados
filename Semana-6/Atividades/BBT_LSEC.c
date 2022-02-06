@@ -9,7 +9,7 @@ typedef struct sNO{
 
 }NO;
 
-void inicializar( NO **ptrLista ){
+void iniciar( NO **ptrLista ){
     
     *ptrLista = NULL;
 
@@ -42,6 +42,8 @@ void inserirInicio( NO **lista, char elem ){
 
     if ( novo != NULL){
         
+        novo->info = elem;
+
         if(listaVazia(*lista)){
 
             *lista = novo;
@@ -134,7 +136,6 @@ void removerFim ( NO **lista ){
         
     }else{
         printf("\nErro, lista vazia!\n");
-        exit(1);
     }
 
 }
@@ -148,13 +149,12 @@ void imprimirLista( NO *lista ){
         aux = lista->prox;
 
         do{
-            printf("%d\t", aux->info);
+            printf("%c \t", aux->info);
             aux = aux->prox;
         } while (aux != lista->prox);
 
     }else{
         printf("\nLista vazia!");
-        exit(1);
     }
     
     printf("\n");

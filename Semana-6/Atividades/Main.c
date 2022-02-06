@@ -1,56 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "BBT_LSEC.c"
 
-int main(){
+int main(void){
     
 
-    NO *ptrLista;
+    NO* ptrLista;
     int menu;
+    char elem;
 
-    inicializar( &ptrLista );
+    iniciar( &ptrLista );
     
     do{
-
+        printf("\nEscolha uma opcao\n");
         printf( "1-Inserir no inicio\n" );
         printf( "2-Remover no final\n" );
         printf( "3-Listar vogais\n" );
-        printf( "4-Sair\n" );
+        printf( "4-Sair\n\n" );
+        fflush(stdin);
         scanf( "%d", &menu );
 
-        switch (menu)
-        {
+        switch (menu){
         case 1:{
 
-            char elem;
-
             printf( "Insira o char:\n" );
-            scanf( "%c", &elem );
             fflush(stdin);
-
-            inserirFim( &ptrLista, elem );
+            scanf( "%c", &elem );
+            inserirInicio( &ptrLista, elem );
             break;
         
         }
 
         case 2:{
 
-            removerInicio( &ptrLista );
+            removerFim( &ptrLista );
             break;
         
         }
         
         case 3:{
-
+            
             imprimirLista( ptrLista );
             break;
         
         }
         
-        default:
-            break;
+        break;
         }
-
-
-    }while( menu != 4 );
-
+        printf("\n");
+    }
+    while( menu !=4 );
     return 0;
 }
